@@ -1,0 +1,1265 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>NutriTrack // Neon Overdrive</title>
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700&family=Share+Tech+Mono&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#05060A;
+  --s1:#0c0d12;
+  --s2:#11131c;
+  --s3:#161924;
+  --line:#1c1f2e;
+  --line2:#252840;
+  --txt:#e8e8e8;
+  --txt2:#6b7090;
+  --txt3:#3d4060;
+  --acc:#00F5D4;
+  --acc-dim:rgba(0,245,212,.06);
+  --acc-line:rgba(0,245,212,.18);
+  --red:#F72585;
+  --amber:#ffd600;
+  --blue:#57b8ff;
+  --purple:#7B2CBF;
+  --glass:rgba(255,255,255,0.03);
+  --fh:'Orbitron',sans-serif;
+  --fb:'Share Tech Mono',monospace;
+}
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--txt);font-family:var(--fb);min-height:100vh;font-size:13px;
+  background-image:radial-gradient(ellipse at top,rgba(0,245,212,0.07) 0%,transparent 60%)}
+input,textarea,button,select{font-family:var(--fb)}
+button{cursor:pointer}
+::-webkit-scrollbar{width:3px}
+::-webkit-scrollbar-thumb{background:var(--line2);border-radius:99px}
+
+@keyframes fu{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:translateY(0)}}
+@keyframes fi{from{opacity:0}to{opacity:1}}
+@keyframes sp{to{transform:rotate(360deg)}}
+@keyframes scan{0%{left:-100%}100%{left:100%}}
+@keyframes scanv{0%{top:-2%}100%{top:106%}}
+@keyframes pop{0%{transform:scale(.95);opacity:0}100%{transform:scale(1);opacity:1}}
+@keyframes dotpulse{0%,100%{opacity:1}50%{opacity:.3}}
+
+.sc{display:none;min-height:100vh}
+.sc.on{display:flex}
+
+/* ── inputs ── */
+.inp{width:100%;padding:11px 13px;background:var(--s2);border:1px solid var(--line2);border-radius:8px;
+  color:var(--txt);font-size:13px;outline:none;transition:border-color .2s,box-shadow .2s;font-family:var(--fb)}
+.inp:focus{border-color:var(--acc)}
+.inp::placeholder{color:var(--txt3)}
+textarea.inp{resize:vertical;min-height:110px;line-height:1.7}
+
+/* ── buttons ── */
+.btn-primary{width:100%;padding:12px;background:linear-gradient(135deg,var(--acc),var(--purple));
+  color:#05060A;border:none;border-radius:8px;font-size:12px;font-weight:700;font-family:var(--fh);
+  letter-spacing:1.5px;text-transform:uppercase;transition:all .2s}
+.btn-primary:hover{transform:scale(1.02)}
+.btn-primary:active{transform:scale(.98)}
+.btn-primary:disabled{opacity:.3;cursor:not-allowed;transform:none;box-shadow:none}
+.btn-sec{background:transparent;color:var(--txt2);border:1px solid var(--line2);border-radius:8px;
+  padding:10px 16px;font-size:12px;font-weight:500;transition:all .15s;font-family:var(--fb)}
+.btn-sec:hover{border-color:var(--acc);color:var(--acc)}
+
+/* ══ AUTH ══ */
+#sc-auth{align-items:center;justify-content:center;padding:24px;flex-direction:column;background:var(--bg)}
+.auth-wrap{max-width:380px;width:100%;animation:fu .4s ease both}
+.auth-head{margin-bottom:32px;text-align:center}
+.auth-icon{font-size:32px;margin-bottom:14px;display:block}
+.auth-title{font-family:var(--fh);font-size:20px;font-weight:700;letter-spacing:2px;margin-bottom:6px;
+  color:var(--acc)}
+.auth-sub{color:var(--txt2);font-size:12px;letter-spacing:.5px}
+
+.key-box{background:var(--s1);border:1px solid var(--line2);border-radius:10px;padding:14px;margin-bottom:20px}
+.key-box-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px}
+.key-box-title{font-size:10px;font-weight:700;color:var(--txt2);text-transform:uppercase;letter-spacing:.1em}
+.key-status{font-size:10px;font-weight:700;letter-spacing:.05em}
+.key-status.ok{color:var(--acc)}
+.key-status.no{color:var(--txt3)}
+.key-row{display:flex;gap:7px}
+.key-inp{flex:1;padding:9px 11px;background:var(--s2);border:1px solid var(--line2);border-radius:7px;
+  color:var(--acc);font-size:11px;outline:none;font-family:monospace;letter-spacing:.03em;transition:border-color .15s}
+.key-inp:focus{border-color:var(--acc)}
+.key-inp::placeholder{color:var(--txt3);font-family:var(--fb);letter-spacing:0}
+.key-btn{padding:9px 14px;background:linear-gradient(135deg,var(--acc),var(--purple));color:#05060A;border:none;
+  border-radius:7px;font-size:11px;font-weight:700;font-family:var(--fh);cursor:pointer;white-space:nowrap;
+  letter-spacing:1px;transition:opacity .15s}
+.key-btn:hover{opacity:.85}
+.key-hint{font-size:11px;color:var(--txt3);margin-top:8px;line-height:1.6}
+.key-hint a{color:var(--acc);text-decoration:none}
+
+.auth-seg{display:flex;background:var(--s2);border-radius:8px;padding:3px;border:1px solid var(--line2);margin-bottom:18px}
+.auth-seg-btn{flex:1;padding:9px;border:none;border-radius:6px;font-size:11px;font-weight:700;cursor:pointer;
+  transition:all .15s;font-family:var(--fh);letter-spacing:1px;text-transform:uppercase}
+.auth-seg-btn.on{background:linear-gradient(135deg,var(--acc),var(--purple));color:#05060A}
+.auth-seg-btn:not(.on){background:transparent;color:var(--txt2)}
+
+.field{margin-bottom:12px}
+.field-lbl{font-size:10px;color:var(--txt2);font-weight:700;text-transform:uppercase;letter-spacing:.1em;
+  margin-bottom:5px;display:block}
+.form-err{color:var(--red);font-size:11px;min-height:16px;margin-bottom:8px}
+
+/* ══ ONBOARD ══ */
+#sc-ob{align-items:center;justify-content:center;padding:20px;background:var(--bg)}
+.ob-wrap{max-width:420px;width:100%;background:var(--s1);border:1px solid var(--line2);border-radius:14px;
+  padding:28px;animation:fu .4s ease both}
+.ob-prog-track{height:2px;background:var(--line2);border-radius:99px;margin-bottom:24px}
+.ob-prog-fill{height:100%;border-radius:99px;background:linear-gradient(90deg,var(--acc),var(--purple));transition:width .4s ease}
+.ob-step-tag{font-size:10px;color:var(--acc);font-weight:700;text-transform:uppercase;letter-spacing:.12em;margin-bottom:8px}
+.ob-title{font-family:var(--fh);font-size:17px;font-weight:700;margin-bottom:6px;letter-spacing:1px;color:var(--txt)}
+.ob-sub{color:var(--txt2);font-size:12px;margin-bottom:20px;line-height:1.6}
+
+.unit-toggle{display:flex;background:var(--s2);border:1px solid var(--line2);border-radius:8px;overflow:hidden}
+.unit-btn{padding:10px 16px;border:none;font-weight:700;font-size:11px;cursor:pointer;transition:all .15s;
+  font-family:var(--fh);letter-spacing:1px}
+.unit-btn.on{background:linear-gradient(135deg,var(--acc),var(--purple));color:#05060A}
+.unit-btn:not(.on){background:transparent;color:var(--txt2)}
+
+.goal-option{width:100%;display:flex;align-items:center;gap:12px;padding:13px 14px;border-radius:10px;
+  background:transparent;border:1px solid var(--line2);cursor:pointer;margin-bottom:8px;text-align:left;transition:all .2s}
+.goal-option.on{background:var(--acc-dim);border-color:var(--acc-line)}
+.goal-option:hover:not(.on){border-color:var(--acc);background:rgba(0,245,212,.03)}
+.goal-em{font-size:20px;flex-shrink:0}
+.goal-name{font-size:12px;font-weight:700;color:var(--txt);margin-bottom:2px;letter-spacing:.5px}
+.goal-info{font-size:11px;color:var(--txt2)}
+
+.tgt-card{background:var(--acc-dim);border:1px solid var(--acc-line);border-radius:10px;padding:13px 15px;margin-bottom:18px}
+.tgt-row{display:flex;justify-content:space-between;align-items:center;padding:4px 0;font-size:12px}
+.tgt-lbl{color:var(--txt2)}
+.tgt-val{font-weight:700;font-family:var(--fh);font-size:13px}
+
+/* ══ APP ══ */
+#sc-app{flex-direction:column;background:var(--bg)}
+
+/* header */
+.hdr{display:flex;align-items:center;justify-content:space-between;padding:0 24px;height:52px;
+  background:rgba(5,6,10,.9);border-bottom:1px solid rgba(0,245,212,.15);
+  position:sticky;top:0;z-index:100;backdrop-filter:blur(20px)}
+.hdr-left{display:flex;align-items:center;gap:10px}
+.hdr-logo-mark{width:28px;height:28px;border-radius:6px;background:linear-gradient(135deg,var(--acc),var(--purple));
+  display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0}
+.hdr-name{font-family:var(--fh);font-size:14px;font-weight:700;letter-spacing:2px;color:var(--acc)}
+.hdr-right{display:flex;align-items:center;gap:8px}
+.hdr-date{font-size:10px;color:var(--txt3);letter-spacing:.5px}
+
+.key-chip{display:flex;align-items:center;gap:5px;padding:5px 10px;border-radius:6px;border:1px solid;
+  font-size:10px;font-weight:700;cursor:pointer;transition:all .15s;letter-spacing:.5px;font-family:var(--fh)}
+.key-chip.ok{background:rgba(0,245,212,.07);border-color:rgba(0,245,212,.2);color:var(--acc)}
+.key-chip.no{background:rgba(247,37,133,.07);border-color:rgba(247,37,133,.2);color:var(--red)}
+.hdr-user{display:flex;align-items:center;gap:6px;padding:5px 10px;background:var(--s2);
+  border:1px solid var(--line2);border-radius:6px}
+.hdr-av{width:20px;height:20px;border-radius:50%;background:linear-gradient(135deg,var(--acc),var(--purple));
+  display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:800;color:#05060A;flex-shrink:0}
+.hdr-uname{font-size:11px;font-weight:500;color:var(--txt2)}
+.hdr-logout{padding:5px 10px;border-radius:6px;background:transparent;border:1px solid var(--line2);
+  color:var(--txt3);font-size:11px;transition:all .15s;font-family:var(--fb)}
+.hdr-logout:hover{color:var(--red);border-color:rgba(247,37,133,.3)}
+
+/* modal */
+.overlay{position:fixed;inset:0;background:rgba(5,6,10,.92);z-index:500;display:none;
+  align-items:center;justify-content:center;padding:20px;backdrop-filter:blur(10px)}
+.overlay.on{display:flex;animation:fi .2s ease}
+.modal{background:var(--s1);border:1px solid var(--line2);border-radius:14px;padding:24px;
+  max-width:420px;width:100%;position:relative}
+.modal-title{font-family:var(--fh);font-size:15px;font-weight:700;margin-bottom:4px;letter-spacing:1px;color:var(--acc)}
+.modal-sub{font-size:11px;color:var(--txt2);margin-bottom:18px;line-height:1.6}
+.modal-close{position:absolute;top:14px;right:14px;padding:4px 9px;border-radius:6px;
+  background:transparent;border:1px solid var(--line2);color:var(--txt3);font-size:11px;font-family:var(--fb)}
+.modal-close:hover{border-color:var(--acc);color:var(--acc)}
+.modal-hint{margin-top:14px;padding:12px;background:var(--acc-dim);border:1px solid var(--acc-line);
+  border-radius:8px;font-size:11px;color:var(--txt2);line-height:1.6}
+.modal-hint a{color:var(--acc);text-decoration:none}
+.modal-hint strong{color:var(--txt)}
+
+/* body layout */
+.body{max-width:800px;margin:0 auto;padding:20px;width:100%;display:flex;flex-direction:column;gap:16px}
+
+/* section / card */
+.section{background:var(--glass);border:1px solid rgba(255,255,255,0.06);border-radius:14px;overflow:hidden}
+.section-pad{padding:20px}
+
+/* rings */
+.rings-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;padding:20px}
+.ring-item{display:flex;flex-direction:column;align-items:center;gap:7px}
+.ring-wrap{position:relative}
+.ring-center{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center}
+.ring-v{font-size:14px;font-weight:700;font-family:var(--fh);line-height:1}
+.ring-max-txt{font-size:9px;color:var(--txt3);margin-top:1px}
+.ring-name{font-size:9px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;font-family:var(--fh)}
+
+/* calorie callout */
+.cal-strip{display:flex;align-items:center;justify-content:space-between;padding:14px 20px;
+  border-bottom:1px solid rgba(255,255,255,.05)}
+.cal-strip-left .label{font-size:10px;color:var(--txt2);font-weight:700;text-transform:uppercase;
+  letter-spacing:.1em;margin-bottom:3px}
+.cal-strip-left .sub{font-size:11px;color:var(--txt3)}
+.cal-rem{text-align:right}
+.cal-rem-num{font-size:22px;font-weight:700;font-family:var(--fh);line-height:1}
+.cal-rem-lbl{font-size:10px;color:var(--txt2);margin-top:3px;letter-spacing:.3px}
+.cal-rem-num.pos{color:var(--acc)}
+.cal-rem-num.neg{color:var(--red)}
+
+/* tabs */
+.tabs{display:flex;border-bottom:1px solid rgba(255,255,255,.05)}
+.tab{flex:1;padding:13px;font-size:11px;font-weight:700;background:transparent;border:none;
+  color:var(--txt3);transition:all .15s;position:relative;font-family:var(--fh);letter-spacing:1px;
+  text-transform:uppercase}
+.tab.on{color:var(--acc)}
+.tab.on::after{content:'';position:absolute;bottom:-1px;left:16px;right:16px;height:1.5px;
+  background:var(--acc);border-radius:99px}
+
+/* drop zone */
+.drop{border:2px dashed rgba(0,245,212,.3);border-radius:10px;padding:28px 16px;text-align:center;
+  cursor:pointer;transition:all .2s;background:transparent;margin-bottom:12px;position:relative;overflow:hidden}
+.drop:hover,.drop.dg{border-color:var(--acc);background:var(--acc-dim)}
+.drop.hp{padding:0;border-color:var(--acc);border-style:solid}
+.drop::after{content:'';position:absolute;top:0;left:-100%;width:100%;height:1.5px;
+  background:linear-gradient(90deg,transparent,var(--acc),transparent);animation:scan 2.5s linear infinite}
+.drop-ico{font-size:28px;margin-bottom:8px}
+.drop-lbl{font-size:12px;font-weight:700;margin-bottom:4px;letter-spacing:.5px}
+.drop-sub{font-size:11px;color:var(--txt3)}
+#nt-prev{width:100%;max-height:200px;object-fit:cover;display:none;border-radius:8px}
+.scan-bar{position:absolute;left:0;right:0;height:1.5px;
+  background:linear-gradient(90deg,transparent,var(--acc),transparent);
+  animation:scanv 2s linear infinite;pointer-events:none;display:none}
+.photo-rdy{position:absolute;top:8px;right:8px;padding:4px 10px;background:rgba(5,6,10,.9);
+  border-radius:5px;font-size:10px;color:var(--acc);font-weight:700;display:none;font-family:var(--fh);
+  letter-spacing:.5px;border:1px solid var(--acc-line)}
+
+.wt-row{display:none;gap:8px;margin-bottom:12px}
+.wt-row .inp{flex:1}
+.clr-btn{padding:10px 13px;border-radius:8px;background:transparent;border:1px solid var(--line2);
+  color:var(--txt3);font-size:12px;font-weight:500;white-space:nowrap;transition:all .15s;font-family:var(--fb)}
+.clr-btn:hover{color:var(--red);border-color:rgba(247,37,133,.3)}
+
+.err{color:var(--red);font-size:11px;min-height:16px;margin-top:8px;font-weight:500}
+
+/* result */
+.result{margin-top:14px;padding:16px;border-radius:10px;background:var(--acc-dim);
+  border:1px solid var(--acc-line);display:none}
+.result.on{display:block;animation:pop .3s ease both}
+.result-top{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:12px}
+.result-tag{font-size:9px;color:var(--acc);font-weight:700;text-transform:uppercase;letter-spacing:.12em;margin-bottom:4px}
+.result-name{font-size:13px;font-weight:700;color:var(--txt);letter-spacing:.5px}
+.result-dismiss{padding:3px 9px;border-radius:6px;background:transparent;border:1px solid var(--line2);
+  color:var(--txt3);font-size:10px;font-family:var(--fb)}
+.result-dismiss:hover{border-color:var(--acc);color:var(--acc)}
+.macros-row{display:flex;gap:7px;flex-wrap:wrap;margin-bottom:13px}
+.mpill{display:flex;flex-direction:column;align-items:center;gap:2px;padding:9px 12px;border-radius:8px;
+  background:var(--s2);border:1px solid var(--line2);min-width:64px}
+.mpill-v{font-size:14px;font-weight:700;font-family:var(--fh)}
+.mpill-l{font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--txt3)}
+
+/* spinner */
+.spin{width:13px;height:13px;border-radius:50%;border:2px solid rgba(5,6,10,.2);border-top-color:#05060A;
+  animation:sp .6s linear infinite;display:inline-block;vertical-align:middle;margin-right:7px}
+
+/* food log */
+.log-empty{text-align:center;padding:36px 16px;color:var(--txt3)}
+.log-empty-ico{font-size:28px;margin-bottom:10px}
+.log-empty-title{font-size:12px;font-weight:700;color:var(--txt2);margin-bottom:4px;letter-spacing:.5px}
+.log-items{display:flex;flex-direction:column}
+.log-item{display:flex;align-items:center;gap:10px;padding:13px 20px;border-bottom:1px solid rgba(255,255,255,.04)}
+.log-item:last-of-type{border-bottom:none}
+.li-info{flex:1;min-width:0}
+.li-name{font-size:12px;font-weight:700;color:var(--txt);margin-bottom:5px;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;letter-spacing:.3px}
+.li-macros{display:flex;gap:8px;flex-wrap:wrap}
+.li-m{font-size:11px;font-weight:700}
+.li-m span{font-weight:400;color:var(--txt3)}
+.rm{width:26px;height:26px;flex-shrink:0;border-radius:6px;border:1px solid var(--line2);
+  background:transparent;color:var(--txt3);font-size:12px;display:flex;align-items:center;
+  justify-content:center;transition:all .15s}
+.rm:hover{background:rgba(247,37,133,.1);color:var(--red);border-color:rgba(247,37,133,.3)}
+.totals-strip{display:flex;align-items:center;padding:12px 20px;background:var(--acc-dim);
+  border-top:1px solid var(--acc-line)}
+.totals-lbl{font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--acc);
+  margin-bottom:4px;font-family:var(--fh)}
+.totals-nums{display:flex;gap:10px;flex-wrap:wrap}
+.tot-m{font-size:12px;font-weight:700}
+.tot-m span{font-weight:400;color:var(--txt2)}
+
+.log-badge{padding:3px 9px;border-radius:5px;background:var(--acc-dim);border:1px solid var(--acc-line);
+  font-size:10px;color:var(--acc);font-weight:700;display:none;font-family:var(--fh);letter-spacing:.5px}
+
+/* section header */
+.sec-hdr{display:flex;align-items:center;justify-content:space-between;padding:14px 20px;
+  border-bottom:1px solid rgba(255,255,255,.05)}
+.sec-title{font-family:var(--fh);font-size:12px;font-weight:700;letter-spacing:1.5px;
+  text-transform:uppercase;color:var(--acc)}
+
+/* status dot */
+.status-dot{width:6px;height:6px;border-radius:50%;background:var(--acc);display:inline-block;
+  margin-right:4px;animation:dotpulse 1.8s infinite}
+
+@media(max-width:560px){
+  .hdr{padding:0 14px}
+  .body{padding:14px 12px;gap:12px}
+  .rings-grid{gap:8px;padding:14px}
+  .ring-v{font-size:12px}
+  .hdr-uname{display:none}
+  .hdr-date{display:none}
+}
+
+/* ══ BOTTOM TABS ══ */
+@keyframes tabSlide{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+@keyframes tabPop{0%{transform:scale(.85)}60%{transform:scale(1.1)}100%{transform:scale(1)}}
+
+.bottom-nav{
+  position:fixed;bottom:0;left:0;right:0;
+  height:62px;
+  background:rgba(5,6,10,.95);
+  border-top:1px solid rgba(0,245,212,.15);
+  display:flex;align-items:center;justify-content:space-around;
+  padding:0 8px 4px;
+  z-index:200;
+  backdrop-filter:blur(24px);
+  -webkit-backdrop-filter:blur(24px);
+}
+.bottom-nav::before{
+  content:'';position:absolute;top:0;left:0;right:0;height:1px;
+  background:linear-gradient(90deg,transparent,var(--acc),transparent);
+  opacity:.5;
+}
+.bnav-btn{
+  flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;
+  padding:8px 4px 6px;border:none;background:transparent;cursor:pointer;
+  border-radius:10px;transition:all .2s;position:relative;max-width:100px;
+}
+.bnav-icon{font-size:20px;transition:all .2s;filter:grayscale(1) brightness(.4)}
+.bnav-label{font-size:9px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;
+  color:var(--txt3);font-family:var(--fh);transition:all .2s}
+.bnav-btn.on .bnav-icon{filter:none;transform:scale(1.15);animation:tabPop .3s ease}
+.bnav-btn.on .bnav-label{color:var(--acc)}
+.bnav-btn.on::after{
+  content:'';position:absolute;bottom:0;left:50%;transform:translateX(-50%);
+  width:22px;height:2px;border-radius:99px;
+  background:var(--acc);
+}
+.bnav-btn:hover:not(.on) .bnav-icon{filter:grayscale(.3) brightness(.7)}
+.bnav-btn:hover:not(.on) .bnav-label{color:var(--txt2)}
+
+/* ══ PAGE SYSTEM ══ */
+.app-scroll{flex:1;overflow-y:auto;padding-bottom:70px}
+.app-page{display:none}
+.app-page.active{display:block;animation:tabSlide .25s ease both}
+
+/* ══ HISTORY PAGE ══ */
+.hist-empty{text-align:center;padding:60px 20px}
+.hist-empty-ico{font-size:36px;margin-bottom:12px;opacity:.3}
+.hist-empty-title{font-family:var(--fh);font-size:12px;font-weight:700;color:var(--txt2);
+  letter-spacing:1px;margin-bottom:6px}
+.hist-empty-sub{font-size:11px;color:var(--txt3);letter-spacing:.3px}
+
+.hist-day{margin-bottom:16px;animation:fu .3s ease both}
+.hist-day-hdr{display:flex;align-items:center;justify-content:space-between;
+  padding:10px 20px;border-bottom:1px solid rgba(0,245,212,.08)}
+.hist-day-date{font-family:var(--fh);font-size:10px;font-weight:700;color:var(--acc);
+  letter-spacing:1px;text-transform:uppercase}
+.hist-day-kcal{font-family:var(--fh);font-size:11px;font-weight:700;color:var(--txt2)}
+.hist-item{display:flex;align-items:center;justify-content:space-between;
+  padding:11px 20px;border-bottom:1px solid rgba(255,255,255,.03)}
+.hist-item:last-child{border-bottom:none}
+.hist-item-name{font-size:12px;font-weight:700;color:var(--txt);letter-spacing:.3px;margin-bottom:4px}
+.hist-item-macros{display:flex;gap:8px;flex-wrap:wrap}
+.hi-m{font-size:10px;font-weight:700}
+.hi-m span{font-weight:400;color:var(--txt3)}
+.hist-item-cal{font-family:var(--fh);font-size:12px;font-weight:700;white-space:nowrap;margin-left:12px}
+
+/* ══ MEAL IDEAS PAGE ══ */
+.meals-hero{background:var(--acc-dim);border:1px solid var(--acc-line);border-radius:14px;
+  padding:18px 20px;margin-bottom:16px;position:relative;overflow:hidden}
+.meals-hero::before{content:'';position:absolute;top:-30px;right:-30px;width:120px;height:120px;
+  background:radial-gradient(circle,rgba(0,245,212,.15),transparent);pointer-events:none}
+.meals-hero-tag{font-size:9px;color:var(--acc);font-weight:700;text-transform:uppercase;
+  letter-spacing:.12em;margin-bottom:6px;font-family:var(--fh)}
+.meals-hero-title{font-family:var(--fh);font-size:16px;font-weight:700;margin-bottom:4px;letter-spacing:1px}
+.meals-hero-sub{font-size:11px;color:var(--txt2);line-height:1.65}
+.meals-goal-pill{display:inline-flex;align-items:center;gap:6px;padding:5px 12px;border-radius:20px;
+  font-size:10px;font-weight:700;font-family:var(--fh);letter-spacing:.08em;margin-top:10px}
+
+.meal-section{margin-bottom:20px}
+.meal-section-hdr{display:flex;align-items:center;gap:10px;margin-bottom:10px}
+.meal-time-icon{width:36px;height:36px;border-radius:10px;display:flex;align-items:center;
+  justify-content:center;font-size:18px;flex-shrink:0;border:1px solid rgba(255,255,255,.06)}
+.meal-time-name{font-family:var(--fh);font-size:12px;font-weight:700;letter-spacing:1px;text-transform:uppercase}
+.meal-time-sub{font-size:10px;color:var(--txt3);margin-top:1px;letter-spacing:.3px}
+
+.food-cards{display:flex;flex-direction:column;gap:8px}
+.food-card{display:flex;align-items:center;gap:12px;padding:12px 14px;
+  background:var(--glass);border:1px solid rgba(255,255,255,.06);border-radius:10px;
+  transition:all .2s}
+.food-card:hover{border-color:rgba(0,245,212,.2);transform:translateX(3px)}
+.food-card-emoji{width:38px;height:38px;border-radius:9px;background:var(--s2);
+  border:1px solid var(--line2);display:flex;align-items:center;justify-content:center;
+  font-size:20px;flex-shrink:0}
+.food-card-info{flex:1;min-width:0}
+.food-card-name{font-size:12px;font-weight:700;color:var(--txt);margin-bottom:3px;letter-spacing:.3px}
+.food-card-why{font-size:10px;color:var(--txt2);line-height:1.5}
+.food-card-right{display:flex;flex-direction:column;align-items:flex-end;gap:2px;flex-shrink:0}
+.food-card-cal{font-size:13px;font-weight:700;font-family:var(--fh)}
+.food-card-macros{font-size:9px;color:var(--txt3);font-weight:700;letter-spacing:.3px;text-align:right}
+
+.meal-divider{height:1px;background:linear-gradient(90deg,transparent,rgba(0,245,212,.1),transparent);
+  margin:6px 0 20px}
+</style>
+</head>
+<body>
+
+<!-- ══ AUTH ══ -->
+<div class="sc on" id="sc-auth">
+  <div class="auth-wrap">
+    <div class="auth-head">
+      <span class="auth-icon">⬡</span>
+      <div class="auth-title">NutriTrack</div>
+      <div class="auth-sub">// NEON OVERDRIVE · SNAP · SCAN · LOG</div>
+    </div>
+
+    <div class="auth-seg">
+      <button class="auth-seg-btn on" id="sb-in" onclick="switchAuth('in')">Sign In</button>
+      <button class="auth-seg-btn" id="sb-up" onclick="switchAuth('up')">Register</button>
+    </div>
+
+    <div id="f-in">
+      <div class="field"><label class="field-lbl">// Email</label><input class="inp" type="email" id="li-em" placeholder="you@example.com" autocomplete="email"/></div>
+      <div class="field"><label class="field-lbl">// Password</label><input class="inp" type="password" id="li-pw" placeholder="••••••••" autocomplete="current-password" onkeydown="if(event.key==='Enter')doLogin()"/></div>
+      <div class="form-err" id="li-err"></div>
+      <button class="btn-primary" onclick="doLogin()">Initiate Session</button>
+      <div style="text-align:center;margin-top:12px">
+        <button onclick="openForgot()" style="background:none;border:none;color:var(--acc);font-size:11px;font-family:var(--fb);cursor:pointer;text-decoration:underline;text-underline-offset:3px;opacity:.8;letter-spacing:.3px">// Forgot password?</button>
+      </div>
+    </div>
+
+    <div id="f-up" style="display:none">
+      <div class="field"><label class="field-lbl">// Name</label><input class="inp" type="text" id="su-nm" placeholder="Your name"/></div>
+      <div class="field"><label class="field-lbl">// Email</label><input class="inp" type="email" id="su-em" placeholder="you@example.com"/></div>
+      <div class="field"><label class="field-lbl">// Password</label><input class="inp" type="password" id="su-pw" placeholder="Min 6 characters" onkeydown="if(event.key==='Enter')doSignup()"/></div>
+      <div class="form-err" id="su-err"></div>
+      <button class="btn-primary" onclick="doSignup()">Create Account</button>
+    </div>
+
+    <p style="text-align:center;font-size:10px;color:var(--txt3);margin-top:18px;letter-spacing:.5px">
+      <span class="status-dot"></span>DATA STORED LOCALLY · BROWSER ONLY
+    </p>
+  </div>
+</div>
+
+<!-- ══ MODAL: Forgot Password ══ -->
+<div class="overlay" id="modal-forgot">
+  <div class="modal" style="max-width:380px">
+    <button class="modal-close" onclick="closeForgot()">✕</button>
+
+    <!-- Step 1: Enter email -->
+    <div id="fp-s1">
+      <div class="modal-title">// Reset Password</div>
+      <div class="modal-sub">Enter the email linked to your account.</div>
+      <div class="field"><label class="field-lbl">// Email</label><input class="inp" type="email" id="fp-em" placeholder="you@example.com" autocomplete="email" onkeydown="if(event.key==='Enter')fpNext()"/></div>
+      <div class="form-err" id="fp-err1"></div>
+      <button class="btn-primary" onclick="fpNext()">Verify Email</button>
+    </div>
+
+    <!-- Step 2: Set new password -->
+    <div id="fp-s2" style="display:none">
+      <div class="modal-title">// New Password</div>
+      <div class="modal-sub" id="fp-s2-sub">Set a new password for your account.</div>
+      <div class="field"><label class="field-lbl">// New Password</label><input class="inp" type="password" id="fp-pw1" placeholder="Min 6 characters" onkeydown="if(event.key==='Enter')fpReset()"/></div>
+      <div class="field"><label class="field-lbl">// Confirm Password</label><input class="inp" type="password" id="fp-pw2" placeholder="Repeat password" onkeydown="if(event.key==='Enter')fpReset()"/></div>
+      <div class="form-err" id="fp-err2"></div>
+      <div style="display:flex;gap:8px">
+        <button class="btn-sec" onclick="fpBack()">Back</button>
+        <button class="btn-primary" style="flex:1" onclick="fpReset()">Reset Password</button>
+      </div>
+    </div>
+
+    <!-- Step 3: Success -->
+    <div id="fp-s3" style="display:none;text-align:center;padding:10px 0 4px">
+      <div style="font-size:32px;margin-bottom:14px">✓</div>
+      <div class="modal-title" style="justify-content:center">// Password Reset</div>
+      <div class="modal-sub" style="margin-bottom:20px">Your password has been updated. You can now sign in with your new password.</div>
+      <button class="btn-primary" onclick="closeForgot()">Back to Sign In</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══ ONBOARD ══ -->
+<div class="sc" id="sc-ob">
+  <div style="width:100%;display:flex;align-items:center;justify-content:center;padding:20px;background:var(--bg)">
+  <div class="ob-wrap">
+    <div class="ob-prog-track"><div class="ob-prog-fill" id="ob-pf" style="width:33%"></div></div>
+    <div id="ob-1">
+      <div class="ob-step-tag">// Step 1 / 3</div>
+      <div class="ob-title" id="ob-hi">System Init</div>
+      <div class="ob-sub">Enter your body weight to calibrate targets.</div>
+      <div style="display:flex;gap:8px;margin-bottom:18px">
+        <input class="inp" type="number" id="ob-wt" placeholder="e.g. 75" style="flex:1" onkeydown="if(event.key==='Enter')obNext(1)"/>
+        <div class="unit-toggle">
+          <button class="unit-btn on" id="u-kg" onclick="setUnit('kg')">KG</button>
+          <button class="unit-btn" id="u-lb" onclick="setUnit('lbs')">LBS</button>
+        </div>
+      </div>
+      <button class="btn-primary" onclick="obNext(1)">Continue</button>
+    </div>
+    <div id="ob-2" style="display:none">
+      <div class="ob-step-tag">// Step 2 / 3</div>
+      <div class="ob-title">Select Protocol</div>
+      <div class="ob-sub">Choose your primary objective.</div>
+      <button class="goal-option on" id="gb-cut" onclick="selGoal('cut')"><span class="goal-em">🔥</span><div><div class="goal-name">Burn Fat</div><div class="goal-info">Calorie deficit · high protein</div></div></button>
+      <button class="goal-option" id="gb-maintain" onclick="selGoal('maintain')"><span class="goal-em">⚖️</span><div><div class="goal-name">Maintain</div><div class="goal-info">Balanced macros</div></div></button>
+      <button class="goal-option" id="gb-bulk" onclick="selGoal('bulk')"><span class="goal-em">💪</span><div><div class="goal-name">Build Muscle</div><div class="goal-info">Calorie surplus · high protein</div></div></button>
+      <div style="display:flex;gap:8px;margin-top:4px">
+        <button class="btn-sec" onclick="obBack(2)">Back</button>
+        <button class="btn-primary" style="flex:1" onclick="obNext(2)">Continue</button>
+      </div>
+    </div>
+    <div id="ob-3" style="display:none">
+      <div class="ob-step-tag">// Step 3 / 3</div>
+      <div class="ob-title">Daily Targets</div>
+      <div class="ob-sub">Calculated from your weight and protocol.</div>
+      <div class="tgt-card" id="ob-prev"></div>
+      <div style="display:flex;gap:8px">
+        <button class="btn-sec" onclick="obBack(3)">Back</button>
+        <button class="btn-primary" style="flex:1" onclick="finishOb()">Start Tracking</button>
+      </div>
+    </div>
+  </div>
+  </div>
+</div>
+
+<!-- ══ MODAL: API Key ══ -->
+<div class="overlay" id="modal-key">
+  <div class="modal">
+    <button class="modal-close" onclick="closeModal()">✕</button>
+    <div class="modal-title">// API Key</div>
+    <div class="modal-sub">Paste your Anthropic key. Stored locally only.</div>
+    <div id="modal-status" style="font-size:11px;margin-bottom:10px;font-family:var(--fh)"></div>
+    <div class="key-row" style="margin-bottom:8px">
+      <input class="key-inp" type="password" id="modal-key-inp" placeholder="sk-ant-..."/>
+      <button class="key-btn" onclick="saveKey()">Save</button>
+    </div>
+    <div class="modal-hint">
+      Get your key at <a href="https://console.anthropic.com" target="_blank">console.anthropic.com</a>.
+      <strong>Never share your key.</strong> Stays in your browser only.
+    </div>
+  </div>
+</div>
+
+<!-- ══ APP ══ -->
+<div class="sc" id="sc-app">
+  <div class="hdr">
+    <div class="hdr-left">
+      <div class="hdr-logo-mark">⬡</div>
+      <span class="hdr-name">NutriTrack</span>
+      <span class="hdr-date" id="hdr-dt"></span>
+    </div>
+    <div class="hdr-right">
+      <div class="hdr-user">
+        <div class="hdr-av" id="hdr-av">U</div>
+        <span class="hdr-uname" id="hdr-uname">User</span>
+      </div>
+      <button class="hdr-logout" onclick="doLogout()">Sign out</button>
+    </div>
+  </div>
+
+  <div class="app-scroll">
+  <div class="app-page active" id="pg-home">
+  <div class="body">
+
+    <!-- Progress Rings -->
+    <div class="section" style="animation:fu .4s ease both">
+      <div class="cal-strip">
+        <div class="cal-strip-left">
+          <div class="label">// Today</div>
+          <div class="sub" id="dash-sub">—</div>
+        </div>
+        <div class="cal-rem">
+          <div class="cal-rem-num pos" id="cal-num">+0</div>
+          <div class="cal-rem-lbl" id="cal-lbl">kcal remaining</div>
+        </div>
+      </div>
+      <div class="rings-grid">
+        <div class="ring-item">
+          <div class="ring-wrap" style="width:80px;height:80px">
+            <svg width="80" height="80" style="display:block;transform:rotate(-90deg)">
+              <circle cx="40" cy="40" r="32" fill="none" stroke="var(--line2)" stroke-width="5"/>
+              <circle id="rc-c" cx="40" cy="40" r="32" fill="none" stroke="var(--acc)" stroke-width="5" stroke-dasharray="0 201" stroke-linecap="round" style="transition:stroke-dasharray .8s cubic-bezier(.4,2,.6,1)"/>
+            </svg>
+            <div class="ring-center"><div class="ring-v" id="rv-c" style="color:var(--acc)">0</div><div class="ring-max-txt" id="rm-c">/—</div></div>
+          </div>
+          <div class="ring-name" style="color:var(--acc)">Cal</div>
+        </div>
+        <div class="ring-item">
+          <div class="ring-wrap" style="width:80px;height:80px">
+            <svg width="80" height="80" style="display:block;transform:rotate(-90deg)">
+              <circle cx="40" cy="40" r="32" fill="none" stroke="var(--line2)" stroke-width="5"/>
+              <circle id="rc-p" cx="40" cy="40" r="32" fill="none" stroke="var(--red)" stroke-width="5" stroke-dasharray="0 201" stroke-linecap="round" style="transition:stroke-dasharray .8s cubic-bezier(.4,2,.6,1)"/>
+            </svg>
+            <div class="ring-center"><div class="ring-v" id="rv-p" style="color:var(--red)">0</div><div class="ring-max-txt" id="rm-p">/—</div></div>
+          </div>
+          <div class="ring-name" style="color:var(--red)">Protein</div>
+        </div>
+        <div class="ring-item">
+          <div class="ring-wrap" style="width:80px;height:80px">
+            <svg width="80" height="80" style="display:block;transform:rotate(-90deg)">
+              <circle cx="40" cy="40" r="32" fill="none" stroke="var(--line2)" stroke-width="5"/>
+              <circle id="rc-b" cx="40" cy="40" r="32" fill="none" stroke="var(--amber)" stroke-width="5" stroke-dasharray="0 201" stroke-linecap="round" style="transition:stroke-dasharray .8s cubic-bezier(.4,2,.6,1)"/>
+            </svg>
+            <div class="ring-center"><div class="ring-v" id="rv-b" style="color:var(--amber)">0</div><div class="ring-max-txt" id="rm-b">/—</div></div>
+          </div>
+          <div class="ring-name" style="color:var(--amber)">Carbs</div>
+        </div>
+        <div class="ring-item">
+          <div class="ring-wrap" style="width:80px;height:80px">
+            <svg width="80" height="80" style="display:block;transform:rotate(-90deg)">
+              <circle cx="40" cy="40" r="32" fill="none" stroke="var(--line2)" stroke-width="5"/>
+              <circle id="rc-f" cx="40" cy="40" r="32" fill="none" stroke="var(--blue)" stroke-width="5" stroke-dasharray="0 201" stroke-linecap="round" style="transition:stroke-dasharray .8s cubic-bezier(.4,2,.6,1)"/>
+            </svg>
+            <div class="ring-center"><div class="ring-v" id="rv-f" style="color:var(--blue)">0</div><div class="ring-max-txt" id="rm-f">/—</div></div>
+          </div>
+          <div class="ring-name" style="color:var(--blue)">Fat</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Log Food -->
+    <div class="section" style="animation:fu .4s .06s ease both">
+      <div class="tabs">
+        <button class="tab on" id="tb-ph" onclick="switchTab('ph')">📷 &nbsp;Photo Scan</button>
+        <button class="tab" id="tb-tx" onclick="switchTab('tx')">✏️ &nbsp;Text Input</button>
+      </div>
+      <div class="section-pad">
+        <div id="md-ph">
+          <div class="drop" id="dz"
+            onclick="document.getElementById('nt-fi').click()"
+            ondragover="event.preventDefault();this.classList.add('dg')"
+            ondragleave="this.classList.remove('dg')"
+            ondrop="onDrop(event)">
+            <div id="dz-ph">
+              <div class="drop-ico">⬡</div>
+              <div class="drop-lbl">Drop food image · tap to browse</div>
+              <div class="drop-sub">System scan initializing...</div>
+            </div>
+            <img id="nt-prev" src="" alt="food"/>
+            <div class="scan-bar" id="scan-bar"></div>
+            <div class="photo-rdy" id="photo-rdy">✓ READY</div>
+          </div>
+          <input type="file" id="nt-fi" accept="image/*" style="display:none" onchange="onFile(event)"/>
+          <div class="wt-row" id="wt-row">
+            <input class="inp" type="number" id="nt-wt" placeholder="Weight in grams (optional)"/>
+            <button class="clr-btn" onclick="clearPhoto()">Clear</button>
+          </div>
+          <button class="btn-primary" id="btn-ph" onclick="doPhoto()" disabled>Initiate Analysis</button>
+        </div>
+        <div id="md-tx" style="display:none">
+          <textarea class="inp" id="nt-tx" placeholder="Describe your meal...&#10;&#10;e.g. 2 scrambled eggs with buttered toast&#10;200g chicken breast with rice" style="margin-bottom:10px"></textarea>
+          <button class="btn-primary" id="btn-tx" onclick="doText()">Estimate Macros</button>
+        </div>
+
+        <div class="err" id="app-err"></div>
+
+        <div class="result" id="result-box">
+          <div class="result-top">
+            <div>
+              <div class="result-tag">// Claude Estimate</div>
+              <div class="result-name" id="res-nm">—</div>
+            </div>
+            <button class="result-dismiss" onclick="clearRes()">Dismiss</button>
+          </div>
+          <div class="macros-row" id="res-pills"></div>
+          <button class="btn-primary" onclick="addLog()">Add to Log</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Food Log -->
+    <div class="section" style="animation:fu .4s .12s ease both">
+      <div class="sec-hdr">
+        <div class="sec-title">// Food Log</div>
+        <span class="log-badge" id="log-badge"></span>
+      </div>
+      <div id="log-body">
+        <div class="log-empty">
+          <div class="log-empty-ico">🍽️</div>
+          <div class="log-empty-title">No Data Detected</div>
+          <div style="font-size:11px;letter-spacing:.5px">&gt; Awaiting first meal input...</div>
+        </div>
+      </div>
+    </div>
+
+    <div style="height:32px"></div>
+  </div>
+  </div><!-- end pg-home -->
+
+  <!-- HISTORY PAGE -->
+  <div class="app-page" id="pg-history">
+    <div class="body">
+      <div class="section" style="animation:fu .4s ease both">
+        <div class="sec-hdr">
+          <div class="sec-title">// History</div>
+        </div>
+        <div id="hist-body">
+          <div class="hist-empty">
+            <div class="hist-empty-ico">📡</div>
+            <div class="hist-empty-title">No Records Found</div>
+            <div class="hist-empty-sub">&gt; Log meals to build your history...</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div><!-- end pg-history -->
+
+  <!-- MEAL IDEAS PAGE -->
+  <div class="app-page" id="pg-meals">
+    <div class="body">
+      <div id="meals-body"></div>
+    </div>
+  </div><!-- end pg-meals -->
+
+  </div><!-- end app-scroll -->
+
+  <!-- Bottom Navigation -->
+  <div class="bottom-nav">
+    <button class="bnav-btn on" id="bn-home" onclick="switchPage('home')">
+      <span class="bnav-icon">⬡</span>
+      <span class="bnav-label">Home</span>
+    </button>
+    <button class="bnav-btn" id="bn-history" onclick="switchPage('history')">
+      <span class="bnav-icon">📊</span>
+      <span class="bnav-label">History</span>
+    </button>
+    <button class="bnav-btn" id="bn-meals" onclick="switchPage('meals')">
+      <span class="bnav-icon">🍽️</span>
+      <span class="bnav-label">Meal Ideas</span>
+    </button>
+  </div>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function () { 
+var CU=null,selUnit='kg',selGoal='cut',obWt=0,pending=null,photoB64=null,photoMime='image/jpeg';
+var S={get:function(k,fb){try{var v=localStorage.getItem(k);return v!==null?JSON.parse(v):fb;}catch(e){return fb;}},set:function(k,v){try{localStorage.setItem(k,JSON.stringify(v));}catch(e){}}};
+var $=function(id){return document.getElementById(id);};
+function show(id){document.querySelectorAll('.sc').forEach(function(s){s.classList.remove('on');});$(id).classList.add('on');}
+function cg(w,g){var x=parseFloat(w)||70;if(g==='cut')return{cal:Math.round(x*31.5-500),pro:Math.round(x*1.75),fat:Math.round(x*0.7),carb:225};if(g==='bulk')return{cal:Math.round(x*36+300),pro:Math.round(x*2),fat:Math.round(x*0.85),carb:320};return{cal:Math.round(x*33),pro:Math.round(x*1.6),fat:Math.round(x*0.75),carb:250};}
+
+/* ── API Key ── */
+function getKey(){return S.get('nt_key','');}
+window.saveKey=function(){
+  var v1=$('auth-key-inp')?$('auth-key-inp').value.trim():'';
+  var v2=$('modal-key-inp')?$('modal-key-inp').value.trim():'';
+  var k=v1||v2;
+  if(!k){alert('Please paste your API key.');return;}
+  if(!k.startsWith('sk-')){alert('Invalid key format. Should start with sk-ant-...');return;}
+  S.set('nt_key',k);
+  if($('auth-key-inp'))$('auth-key-inp').value='';
+  if($('modal-key-inp'))$('modal-key-inp').value='';
+  syncKeyUI();
+  if($('modal-key').classList.contains('on'))closeModal();
+}
+function syncKeyUI(){
+  var has=getKey().length>10;
+  var as=$('auth-key-status');
+  if(as){as.textContent=has?'✓ Saved':'Not set';as.className='key-status '+(has?'ok':'no');}
+  var chip=$('key-chip');
+  if(chip){chip.className='key-chip '+(has?'ok':'no');$('kc-icon').textContent=has?'●':'●';$('kc-lbl').textContent=has?'Key set':'No key';}
+  var ms=$('modal-status');
+  if(ms){ms.textContent=has?'✓ Key saved':'';ms.style.color='var(--acc)';}
+}
+function openModal(){$('modal-key').classList.add('on');syncKeyUI();}
+function closeModal(){$('modal-key').classList.remove('on');}
+const modal = $('modal-key');
+if (modal) {
+  modal.addEventListener('click', function(e){
+    if(e.target === this) closeModal();
+  });
+}
+
+/* ── Auth ── */
+window.switchAuth=function(m){
+  $('sb-in').classList.toggle('on',m==='in');$('sb-up').classList.toggle('on',m==='up');
+  $('f-in').style.display=m==='in'?'block':'none';$('f-up').style.display=m==='up'?'block':'none';
+  $('li-err').textContent='';$('su-err').textContent='';
+}
+window.doLogin=async function(){
+  $('li-err').textContent='';
+  var em=$('li-em').value.trim(),pw=$('li-pw').value;
+  if(!em||!pw){$('li-err').textContent='Please fill in all fields.';return;}
+  try {
+    var r=await fetch('https://project-1-ihnx.onrender.com/auth/login',{
+      method:'POST',headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({email:em,password:pw})
+    });
+    var d=await r.json();
+    if(!r.ok){$('li-err').textContent=d.error||'Login failed.';return;}
+    localStorage.setItem('nt_token',d.token);
+    CU={email:d.email,name:d.email.split('@')[0]};
+    S.set('nt_sess',CU);
+    if(d.profile && Object.keys(d.profile).length>0){
+      S.set('nt_prof_'+CU.email, d.profile);
+    }
+    afterLogin();
+  } catch(e){$('li-err').textContent='Connection error. Try again.';}
+}
+window.doSignup=async function(){
+  $('su-err').textContent='';
+  var nm=$('su-nm').value.trim(),em=$('su-em').value.trim(),pw=$('su-pw').value;
+  if(!nm){$('su-err').textContent='Enter your name.';return;}
+  if(!em||!em.includes('@')){$('su-err').textContent='Enter a valid email.';return;}
+  if(pw.length<6){$('su-err').textContent='Password must be 6+ characters.';return;}
+  try {
+    var r=await fetch('https://project-1-ihnx.onrender.com/auth/register',{
+      method:'POST',headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({email:em,password:pw})
+    });
+    var d=await r.json();
+    if(!r.ok){$('su-err').textContent=d.error||'Signup failed.';return;}
+    localStorage.setItem('nt_token',d.token);
+    CU={email:d.email,name:nm};
+    S.set('nt_sess',CU);
+    afterLogin();
+  } catch(e){$('su-err').textContent='Connection error. Try again.';}
+}
+window.doLogout=function(){S.set('nt_sess',null);CU=null;localStorage.removeItem('nt_token');show('sc-auth');syncKeyUI();}
+
+/* ── Forgot Password ── */
+window.openForgot=function(){
+  $('fp-em').value='';$('fp-pw1').value='';$('fp-pw2').value='';
+  $('fp-err1').textContent='';$('fp-err2').textContent='';
+  $('fp-s1').style.display='block';$('fp-s2').style.display='none';$('fp-s3').style.display='none';
+  $('modal-forgot').classList.add('on');
+  setTimeout(function(){$('fp-em').focus();},80);
+}
+window.closeForgot=function(){$('modal-forgot').classList.remove('on');}
+var _fpEmail='';
+window.fpNext=function(){
+  $('fp-err1').textContent='';
+  var em=$('fp-em').value.trim();
+  if(!em||!em.includes('@')){$('fp-err1').textContent='Enter a valid email.';return;}
+  var u=S.get('nt_users',{});
+  if(!u[em]){$('fp-err1').textContent='No account found with this email.';return;}
+  _fpEmail=em;
+  $('fp-s2-sub').textContent='Set a new password for '+em;
+  $('fp-s1').style.display='none';$('fp-s2').style.display='block';
+  setTimeout(function(){$('fp-pw1').focus();},80);
+}
+window.fpBack=function(){
+  $('fp-s2').style.display='none';$('fp-s1').style.display='block';
+  $('fp-err2').textContent='';
+}
+window.fpReset=function(){
+  $('fp-err2').textContent='';
+  var pw1=$('fp-pw1').value,pw2=$('fp-pw2').value;
+  if(pw1.length<6){$('fp-err2').textContent='Password must be 6+ characters.';return;}
+  if(pw1!==pw2){$('fp-err2').textContent='Passwords do not match.';return;}
+  var u=S.get('nt_users',{});
+  u[_fpEmail].pw=btoa(unescape(encodeURIComponent(pw1)));
+  S.set('nt_users',u);
+  $('fp-s2').style.display='none';$('fp-s3').style.display='block';
+}
+var fmodal=$('modal-forgot');
+if(fmodal){fmodal.addEventListener('click',function(e){if(e.target===this)closeForgot();});}
+
+function afterLogin(){var p=S.get('nt_prof_'+CU.email,null);if(!p){show('sc-ob');initOb();}else loadApp(p);}
+
+/* ── Onboard ── */
+function initOb(){
+  $('ob-hi').textContent='Hey '+CU.name.split(' ')[0]+'!';
+  $('ob-wt').value='';selGoal='cut';selUnit='kg';
+  $('u-kg').classList.add('on');$('u-lb').classList.remove('on');
+  ['cut','maintain','bulk'].forEach(function(g){$('gb-'+g).classList.remove('on');});
+  $('gb-cut').classList.add('on');obStep(1);
+}
+window.setUnit=function(u){selUnit=u;$('u-kg').classList.toggle('on',u==='kg');$('u-lb').classList.toggle('on',u==='lbs');}
+window.selGoal=function(g){selGoal=g;['cut','maintain','bulk'].forEach(function(id){$('gb-'+id).classList.toggle('on',id===g);});}
+function obStep(n){[1,2,3].forEach(function(i){$('ob-'+i).style.display=i===n?'block':'none';});$('ob-pf').style.width=(n/3*100)+'%';}
+window.obNext=function(s){
+  if(s===1){var w=parseFloat($('ob-wt').value);if(!w||w<=0){alert('Enter a valid weight.');return;}obWt=selUnit==='kg'?w:w*0.453592;obStep(2);}
+  else if(s===2){
+    var g=cg(obWt,selGoal);
+    $('ob-prev').innerHTML='<div style="font-size:10px;color:var(--acc);font-weight:700;text-transform:uppercase;letter-spacing:.1em;margin-bottom:10px;font-family:var(--fh)">// Daily Targets</div>'+
+    [['Calories',g.cal,'kcal','var(--acc)'],['Protein',g.pro,'g','var(--red)'],['Carbs',g.carb,'g','var(--amber)'],['Fat',g.fat,'g','var(--blue)']]
+    .map(function(r){return'<div class="tgt-row"><span class="tgt-lbl">'+r[0]+'</span><span class="tgt-val" style="color:'+r[3]+'">'+r[1]+r[2]+'</span></div>';}).join('');
+    obStep(3);
+  }
+}
+window.obBack=function(s){obStep(s-1);}
+window.finishOb=async function(){
+  var g=cg(obWt,selGoal);
+  var prof={weightKg:obWt,goal:selGoal,goals:g};
+  S.set('nt_prof_'+CU.email,prof);
+  // also save to server
+  var token=localStorage.getItem('nt_token');
+  if(token){
+    fetch('https://project-1-ihnx.onrender.com/user/profile',{
+      method:'POST',
+      headers:{'Content-Type':'application/json','Authorization':'Bearer '+token},
+      body:JSON.stringify(prof)
+    }).catch(function(){});// silent fail, localStorage still works
+  }
+  loadApp(prof);
+}
+/* ── App ── */
+function loadApp(p){
+  show('sc-app');syncKeyUI();
+  $('hdr-dt').textContent=new Date().toLocaleDateString('en-US',{weekday:'short',month:'short',day:'numeric'});
+  $('hdr-av').textContent=CU.name[0].toUpperCase();
+  $('hdr-uname').textContent=CU.name.split(' ')[0];
+  var gl={cut:'Burn Fat',maintain:'Maintenance',bulk:'Build Muscle'};
+  $('dash-sub').textContent=gl[p.goal]+' · '+Math.round(p.weightKg)+'kg';
+  $('rm-c').textContent='/'+p.goals.cal;
+  $('rm-p').textContent='/'+p.goals.pro+'g';
+  $('rm-b').textContent='/'+p.goals.carb+'g';
+  $('rm-f').textContent='/'+p.goals.fat+'g';
+  renderLog();updateDash();
+  switchPage('home');
+}
+window.switchTab = function(t){
+  $('md-ph').style.display=t==='ph'?'block':'none';
+  $('md-tx').style.display=t==='tx'?'block':'none';
+  $('tb-ph').classList.toggle('on',t==='ph');
+  $('tb-tx').classList.toggle('on',t==='tx');
+  clearRes();$('app-err').textContent='';
+}
+
+/* ── Photo ── */
+window.onDrop=function(e){e.preventDefault();$('dz').classList.remove('dg');var f=e.dataTransfer.files[0];if(f&&f.type.startsWith('image/'))loadFile(f);}
+window.onFile=function(e){var f=e.target.files[0];if(f)loadFile(f);}
+function loadFile(file){
+  photoMime = 'image/jpeg';
+  const reader = new FileReader();
+  reader.onload = function(e){
+    const img = new Image();
+    img.onload = function(){
+      const canvas = document.createElement('canvas');
+      const ctx = canvas.getContext('2d');
+      const MAX_WIDTH = 800;
+      const scale = MAX_WIDTH / img.width;
+      canvas.width = MAX_WIDTH;
+      canvas.height = img.height * scale;
+      ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+      const compressed = canvas.toDataURL('image/jpeg', 0.7);
+      photoB64 = compressed.split(',')[1];
+    };
+    img.src = e.target.result;
+  };
+  reader.readAsDataURL(file);
+  var pr = $('nt-prev');
+  pr.src = URL.createObjectURL(file);
+  pr.style.display = 'block';
+  $('dz-ph').style.display = 'none';
+  $('dz').classList.add('hp');
+  $('scan-bar').style.display = 'block';
+  $('photo-rdy').style.display = 'block';
+  $('wt-row').style.display = 'flex';
+  $('btn-ph').disabled = false;
+  clearRes();
+  $('app-err').textContent = '';
+}
+window.clearPhoto=function(){
+  $('nt-prev').style.display='none';$('nt-prev').src='';$('dz-ph').style.display='block';
+  $('dz').classList.remove('hp');$('scan-bar').style.display='none';$('photo-rdy').style.display='none';
+  $('wt-row').style.display='none';$('btn-ph').disabled=true;
+  $('nt-wt').value='';$('nt-fi').value='';photoB64=null;clearRes();
+}
+
+/* ── Claude API ── */
+var SYS='You are a nutrition expert. Return ONLY valid JSON with no markdown or extra text: {"name":string,"calories":number,"protein":number,"carbs":number,"fat":number}';
+
+function callClaude(msgs){
+ return fetch('https://project-1-ihnx.onrender.com/analyze', {
+  method: 'POST',
+  headers: {'Content-Type': 'application/json'},
+  body: JSON.stringify({ 
+   model: 'claude-haiku-4-5-20251001',
+   max_tokens: 300,
+   system: SYS,
+   messages: msgs
+  })
+})
+.then(function(r){
+  if(!r.ok) throw new Error('ERR_'+r.status);
+  return r.json();
+})
+.then(function(d){
+  if(d.error) throw new Error(d.error?.message || JSON.stringify(d.error));
+  return (d.content||[]).map(function(b){ return b.text||''; }).join('');
+  });
+}
+function parseM(t){try{var c=t.replace(/```json|```/g,'').trim();return JSON.parse(c.slice(c.indexOf('{'),c.lastIndexOf('}')+1));}catch(e){return null;}}
+function errMsg(e){
+  if(e.message==='NO_KEY')return'No API key — click "No key" in the header to add yours.';
+  if(e.message==='BAD_KEY')return'Invalid API key. Click the key chip in the header to update it.';
+  if(e.message==='RATE')return'Rate limit hit. Wait a moment and try again.';
+  return'Error: '+(e.message||'Check your connection and try again.');
+}
+function setBusy(id,on,lbl){var b=$(id);if(on){b.disabled=true;b.innerHTML='<span class="spin"></span>Analyzing...';}else{b.disabled=false;b.innerHTML=lbl;}}
+
+window.doPhoto=function(){
+  if(!photoB64)return;
+  $('app-err').textContent='';clearRes();setBusy('btn-ph',true,'Initiate Analysis');
+  var wt=$('nt-wt').value;
+  var note=wt?' Food weighs exactly '+wt+'g — scale all macros for this weight.':'';
+  callClaude([{role:'user',content:[{type:'image',source:{type:'base64',media_type:photoMime,data:photoB64}},{type:'text',text:'Analyze this food.'+note}]}])
+  .then(function(t){var m=parseM(t);if(m)showRes(m);else $('app-err').textContent='Could not parse response. Try again.';})
+  .catch(function(e){$('app-err').textContent=errMsg(e);})
+  .finally(function(){setBusy('btn-ph',false,'Initiate Analysis');});
+}
+window.doText = function(){
+  var inp=$('nt-tx').value.trim();if(!inp)return;
+  $('app-err').textContent='';clearRes();setBusy('btn-tx',true,'Estimate Macros');
+  callClaude([{role:'user',content:'Estimate macros for: '+inp}])
+  .then(function(t){var m=parseM(t);if(m)showRes(m);else $('app-err').textContent='Could not parse response. Try again.';})
+  .catch(function(e){$('app-err').textContent=errMsg(e);})
+  .finally(function(){setBusy('btn-tx',false,'Estimate Macros');});
+}
+function showRes(m){
+  pending=m;$('res-nm').textContent=m.name||'Food item';
+  $('res-pills').innerHTML=[
+    [Math.round(m.calories),'kcal','Cal','var(--acc)'],
+    [Math.round(m.protein)+'g','','Protein','var(--red)'],
+    [Math.round(m.carbs)+'g','','Carbs','var(--amber)'],
+    [Math.round(m.fat)+'g','','Fat','var(--blue)'],
+  ].map(function(r){return'<div class="mpill"><div class="mpill-v" style="color:'+r[3]+'">'+r[0]+r[1]+'</div><div class="mpill-l">'+r[2]+'</div></div>';}).join('');
+  $('result-box').classList.add('on');
+  $('result-box').scrollIntoView({behavior:'smooth',block:'nearest'});
+}
+window.clearRes=function(){pending=null;$('result-box').classList.remove('on');}
+
+/* ── Log ── */
+function todayKey(){return 'nt_log_'+CU.email+'_'+new Date().toISOString().slice(0,10);}
+function getLog(){return S.get(todayKey(),[]);}
+function saveLog(log){S.set(todayKey(),log);}
+window.addLog = function(){
+  if(!pending)return;
+  var log=getLog();log.push(Object.assign({},pending,{id:Date.now()}));saveLog(log);
+  clearRes();clearPhoto();$('nt-tx').value='';renderLog();updateDash();
+}
+window.rmItem=function(id){saveLog(getLog().filter(function(i){return i.id!==id;}));renderLog();updateDash();}
+
+function renderLog(){
+  var log=getLog(),badge=$('log-badge'),body=$('log-body');
+  if(!log.length){
+    badge.style.display='none';
+    body.innerHTML='<div class="log-empty"><div class="log-empty-ico">🍽️</div><div class="log-empty-title">No Data Detected</div><div style="font-size:11px;letter-spacing:.5px">&gt; Awaiting first meal input...</div></div>';
+    return;
+  }
+  badge.textContent=log.length+' item'+(log.length>1?'s':'');badge.style.display='inline-block';
+  var t=log.reduce(function(a,i){return{cal:a.cal+i.calories,pro:a.pro+i.protein,carb:a.carb+i.carbs,fat:a.fat+i.fat};},{cal:0,pro:0,carb:0,fat:0});
+  body.innerHTML='<div class="log-items">'+
+  log.map(function(item,ix){return(
+    '<div class="log-item" style="animation:fu .25s '+(ix*.04)+'s ease both">'+
+    '<div class="li-info">'+
+    '<div class="li-name">'+item.name+'</div>'+
+    '<div class="li-macros">'+
+    '<span class="li-m" style="color:var(--acc)">'+Math.round(item.calories)+' <span>kcal</span></span>'+
+    '<span class="li-m" style="color:var(--red)">'+Math.round(item.protein)+'g <span>P</span></span>'+
+    '<span class="li-m" style="color:var(--amber)">'+Math.round(item.carbs)+'g <span>C</span></span>'+
+    '<span class="li-m" style="color:var(--blue)">'+Math.round(item.fat)+'g <span>F</span></span>'+
+    '</div></div>'+
+    '<button class="rm" onclick="rmItem('+item.id+')">✕</button>'+
+    '</div>');}).join('')+
+  '</div>'+
+  '<div class="totals-strip">'+
+  '<div><div class="totals-lbl">// Total</div>'+
+  '<div class="totals-nums">'+
+  '<span class="tot-m" style="color:var(--acc)">'+Math.round(t.cal)+' <span>kcal</span></span>'+
+  '<span class="tot-m" style="color:var(--red)">'+Math.round(t.pro)+'g <span>P</span></span>'+
+  '<span class="tot-m" style="color:var(--amber)">'+Math.round(t.carb)+'g <span>C</span></span>'+
+  '<span class="tot-m" style="color:var(--blue)">'+Math.round(t.fat)+'g <span>F</span></span>'+
+  '</div></div></div>';
+}
+
+function updateDash(){
+  var p=S.get('nt_prof_'+CU.email,null);if(!p)return;
+  var g=p.goals;
+  var t=getLog().reduce(function(a,i){return{cal:a.cal+i.calories,pro:a.pro+i.protein,carb:a.carb+i.carbs,fat:a.fat+i.fat};},{cal:0,pro:0,carb:0,fat:0});
+  var C=2*Math.PI*32;
+  function sr(id,v,mx){$(id).setAttribute('stroke-dasharray',Math.round(C*Math.min(v/(mx||1),1))+' '+Math.round(C));}
+  sr('rc-c',t.cal,g.cal);$('rv-c').textContent=Math.round(t.cal);
+  sr('rc-p',t.pro,g.pro);$('rv-p').textContent=Math.round(t.pro);
+  sr('rc-b',t.carb,g.carb);$('rv-b').textContent=Math.round(t.carb);
+  sr('rc-f',t.fat,g.fat);$('rv-f').textContent=Math.round(t.fat);
+  var rem=g.cal-t.cal;
+  var cn=$('cal-num');
+  cn.textContent=(rem>=0?'+':'')+Math.round(rem);
+  cn.className='cal-rem-num '+(rem>=0?'pos':'neg');
+  $('cal-lbl').textContent='kcal '+(rem>=0?'remaining':'over goal');
+}
+
+/* ── Page Switching ── */
+window.switchPage = function(pg) {
+  ['home','history','meals'].forEach(function(id) {
+    $('pg-'+id).classList.toggle('active', id===pg);
+    $('bn-'+id).classList.toggle('on', id===pg);
+  });
+  if(pg==='history') renderHistory();
+  if(pg==='meals') renderMeals();
+};
+
+/* ── History ── */
+function renderHistory() {
+  var body = $('hist-body');
+  var days = [];
+  for(var i=0;i<30;i++) {
+    var d = new Date(); d.setDate(d.getDate()-i);
+    var key = 'nt_log_'+CU.email+'_'+d.toISOString().slice(0,10);
+    var log = S.get(key,[]);
+    if(log.length) days.push({date:d, log:log, isToday:i===0});
+  }
+  if(!days.length) {
+    body.innerHTML='<div class="hist-empty"><div class="hist-empty-ico">📡</div><div class="hist-empty-title">No Records Found</div><div class="hist-empty-sub">&gt; Log meals to build your history...</div></div>';
+    return;
+  }
+  body.innerHTML = days.map(function(entry, ei) {
+    var t = entry.log.reduce(function(a,i){return{cal:a.cal+i.calories};},{cal:0});
+    var label = entry.isToday ? 'Today' : entry.date.toLocaleDateString('en-US',{weekday:'short',month:'short',day:'numeric'});
+    return '<div class="hist-day section" style="animation-delay:'+(ei*.05)+'s">'+
+      '<div class="hist-day-hdr">'+
+        '<span class="hist-day-date">// '+label+'</span>'+
+        '<span class="hist-day-kcal" style="color:var(--acc)">'+Math.round(t.cal)+' kcal</span>'+
+      '</div>'+
+      entry.log.map(function(item){
+        return '<div class="hist-item">'+
+          '<div><div class="hist-item-name">'+item.name+'</div>'+
+          '<div class="hist-item-macros">'+
+            '<span class="hi-m" style="color:var(--red)">'+Math.round(item.protein)+'g <span>P</span></span>'+
+            '<span class="hi-m" style="color:var(--amber)">'+Math.round(item.carbs)+'g <span>C</span></span>'+
+            '<span class="hi-m" style="color:var(--blue)">'+Math.round(item.fat)+'g <span>F</span></span>'+
+          '</div></div>'+
+          '<span class="hist-item-cal" style="color:var(--acc)">'+Math.round(item.calories)+' kcal</span>'+
+        '</div>';
+      }).join('')+
+    '</div>';
+  }).join('');
+}
+
+/* ── Meal Ideas ── */
+var MEAL_DATA = {
+  cut: {
+    meta: {label:'Burn Fat Protocol',icon:'🔥',color:'var(--red)',bg:'rgba(247,37,133,.08)',border:'rgba(247,37,133,.2)'},
+    breakfast:[
+      {e:'🍳',n:'Egg White Omelette',w:'High protein, very low fat & calories',cal:180,p:'24g',c:'4g',f:'6g'},
+      {e:'🫐',n:'Greek Yogurt + Berries',w:'Protein-rich with antioxidants, filling',cal:160,p:'18g',c:'20g',f:'2g'},
+      {e:'🌾',n:'Overnight Oats (low sugar)',w:'Slow-release carbs, steady energy',cal:280,p:'12g',c:'42g',f:'5g'},
+    ],
+    lunch:[
+      {e:'🥗',n:'Grilled Chicken Salad',w:'Lean protein with fiber-rich greens',cal:350,p:'38g',c:'15g',f:'12g'},
+      {e:'🐟',n:'Tuna Lettuce Wraps',w:'Zero-carb wrap, pure protein hit',cal:220,p:'30g',c:'6g',f:'7g'},
+      {e:'🥙',n:'Turkey & Veggie Bowl',w:'Balanced macros for a deficit',cal:400,p:'35g',c:'30g',f:'10g'},
+    ],
+    dinner:[
+      {e:'🍗',n:'Baked Salmon + Broccoli',w:'Omega-3s + cruciferous veg, low cal',cal:420,p:'40g',c:'12g',f:'22g'},
+      {e:'🥩',n:'Lean Beef Stir-fry',w:'High protein, colorful micronutrients',cal:390,p:'36g',c:'22g',f:'16g'},
+      {e:'🍲',n:'Lentil Vegetable Soup',w:'Plant protein + fiber, night cravings crushed',cal:310,p:'18g',c:'45g',f:'5g'},
+    ],
+    snacks:[
+      {e:'🥚',n:'Hard-boiled Eggs (2)',w:'Quick protein, portable, zero prep',cal:140,p:'12g',c:'1g',f:'10g'},
+      {e:'🥒',n:'Cucumber + Hummus',w:'Low cal crunch with plant protein',cal:120,p:'5g',c:'14g',f:'5g'},
+    ]
+  },
+  maintain: {
+    meta: {label:'Maintenance Protocol',icon:'⚖️',color:'var(--blue)',bg:'rgba(87,184,255,.08)',border:'rgba(87,184,255,.2)'},
+    breakfast:[
+      {e:'🥞',n:'Protein Pancakes',w:'Balanced carbs + protein to start',cal:380,p:'28g',c:'42g',f:'9g'},
+      {e:'🍌',n:'Banana Peanut Butter Toast',w:'Fast + slow energy blend',cal:340,p:'12g',c:'48g',f:'11g'},
+      {e:'🥣',n:'Granola with Milk',w:'Well-rounded morning fuel',cal:360,p:'14g',c:'55g',f:'10g'},
+    ],
+    lunch:[
+      {e:'🌯',n:'Chicken Burrito Bowl',w:'Complete meal, all macros balanced',cal:520,p:'38g',c:'52g',f:'14g'},
+      {e:'🍜',n:'Egg Noodle Stir-fry',w:'Carb-friendly satisfying lunch',cal:480,p:'22g',c:'64g',f:'12g'},
+      {e:'🥪',n:'Turkey Avocado Sandwich',w:'Healthy fats + protein, easy prep',cal:440,p:'28g',c:'38g',f:'18g'},
+    ],
+    dinner:[
+      {e:'🍝',n:'Pasta with Meat Sauce',w:'Classic balanced dinner',cal:580,p:'30g',c:'72g',f:'16g'},
+      {e:'🍛',n:'Chicken Curry & Rice',w:'Warming, complete, protein-packed',cal:560,p:'36g',c:'58g',f:'14g'},
+      {e:'🐠',n:'Grilled Fish Tacos',w:'Light yet satisfying, healthy fats',cal:490,p:'32g',c:'45g',f:'16g'},
+    ],
+    snacks:[
+      {e:'🧀',n:'Cheese & Whole Grain Crackers',w:'Protein + complex carbs combo',cal:200,p:'10g',c:'20g',f:'9g'},
+      {e:'🍎',n:'Apple + Almond Butter',w:'Natural sugars with healthy fats',cal:220,p:'5g',c:'28g',f:'11g'},
+    ]
+  },
+  bulk: {
+    meta: {label:'Muscle Gain Protocol',icon:'💪',color:'var(--purple)',bg:'rgba(123,44,191,.1)',border:'rgba(123,44,191,.25)'},
+    breakfast:[
+      {e:'🍳',n:'4-Egg Scramble + Toast',w:'High cal, high protein muscle breakfast',cal:560,p:'36g',c:'48g',f:'22g'},
+      {e:'🥤',n:'Mass Gainer Smoothie',w:'Bananas, oats, PB, milk — calorie dense',cal:680,p:'30g',c:'90g',f:'18g'},
+      {e:'🧇',n:'Waffles + Greek Yogurt',w:'Carb-loading with protein for repair',cal:590,p:'28g',c:'78g',f:'14g'},
+    ],
+    lunch:[
+      {e:'🍖',n:'Double Chicken Rice Bowl',w:'Massive protein hit + complex carbs',cal:720,p:'58g',c:'80g',f:'16g'},
+      {e:'🫔',n:'Beef & Cheese Quesadilla',w:'Calorie-dense, high protein',cal:680,p:'42g',c:'52g',f:'28g'},
+      {e:'🥩',n:'Steak + Sweet Potato',w:'Complete amino acids + slow carbs',cal:640,p:'48g',c:'55g',f:'18g'},
+    ],
+    dinner:[
+      {e:'🍝',n:'Bolognese + Garlic Bread',w:'Massive calorie surplus meal',cal:820,p:'46g',c:'90g',f:'24g'},
+      {e:'🍗',n:'Whole Roast Chicken + Rice',w:'Protein feast, rest day recovery',cal:780,p:'68g',c:'65g',f:'22g'},
+      {e:'🥘',n:'Chickpea & Beef Stew',w:'High cal, protein & iron for growth',cal:700,p:'50g',c:'62g',f:'20g'},
+    ],
+    snacks:[
+      {e:'🥜',n:'Mixed Nuts & Dried Fruit',w:'Calorie-dense healthy fat surplus',cal:320,p:'8g',c:'30g',f:'20g'},
+      {e:'🍫',n:'High-Cal Protein Bar',w:'Quick 300+ cal hit between meals',cal:300,p:'20g',c:'34g',f:'10g'},
+    ]
+  }
+};
+
+function renderMeals() {
+  var p = S.get('nt_prof_'+CU.email,null);
+  var goal = p ? p.goal : 'maintain';
+  var data = MEAL_DATA[goal];
+  var meta = data.meta;
+  var sections = [
+    {key:'breakfast',icon:'☀️',name:'Breakfast',sub:'Morning fuel',color:'var(--amber)',bg:'rgba(255,214,0,.07)'},
+    {key:'lunch',icon:'◐',name:'Lunch',sub:'Midday energy',color:'var(--blue)',bg:'rgba(87,184,255,.07)'},
+    {key:'dinner',icon:'◑',name:'Dinner',sub:'Evening recovery',color:'var(--purple)',bg:'rgba(123,44,191,.1)'},
+    {key:'snacks',icon:'⚡',name:'Snacks',sub:'Between meals',color:'var(--acc)',bg:'rgba(0,245,212,.06)'},
+  ];
+  var html = '<div class="meals-hero">'+
+    '<div class="meals-hero-tag">// Personalized Nutrition Plan</div>'+
+    '<div class="meals-hero-title">Meal Suggestions</div>'+
+    '<div class="meals-hero-sub">Foods optimized for your '+meta.label.replace(' Protocol','').toLowerCase()+' goal and daily targets.</div>'+
+    '<span class="meals-goal-pill" style="background:'+meta.bg+';border:1px solid '+meta.border+';color:'+meta.color+'">'+meta.icon+' '+meta.label+'</span>'+
+  '</div>';
+
+  sections.forEach(function(sec, si) {
+    var foods = data[sec.key]; if(!foods) return;
+    if(si>0) html += '<div class="meal-divider"></div>';
+    html += '<div class="meal-section">'+
+      '<div class="meal-section-hdr">'+
+        '<div class="meal-time-icon" style="background:'+sec.bg+'">'+sec.icon+'</div>'+
+        '<div>'+
+          '<div class="meal-time-name" style="color:'+sec.color+'">'+sec.name+'</div>'+
+          '<div class="meal-time-sub">'+sec.sub+'</div>'+
+        '</div>'+
+      '</div>'+
+      '<div class="food-cards">'+
+      foods.map(function(f) {
+        return '<div class="food-card">'+
+          '<div class="food-card-emoji">'+f.e+'</div>'+
+          '<div class="food-card-info">'+
+            '<div class="food-card-name">'+f.n+'</div>'+
+            '<div class="food-card-why">'+f.w+'</div>'+
+          '</div>'+
+          '<div class="food-card-right">'+
+            '<div class="food-card-cal" style="color:'+sec.color+'">'+f.cal+'<span style="font-size:9px;color:var(--txt3)"> kcal</span></div>'+
+            '<div class="food-card-macros">P:'+f.p+' C:'+f.c+' F:'+f.f+'</div>'+
+          '</div>'+
+        '</div>';
+      }).join('')+
+      '</div></div>';
+  });
+  html += '<div style="height:16px"></div>';
+  $('meals-body').innerHTML = html;
+}
+
+/* ── Boot ── */
+syncKeyUI();
+var sess=S.get('nt_sess',null);
+if(sess&&sess.email){CU=sess;afterLogin();}
+else show('sc-auth');
+});
+</script>
+</body>
+</html>
